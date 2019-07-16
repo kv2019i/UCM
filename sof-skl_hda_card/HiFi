@@ -1,0 +1,391 @@
+# Use case Configuration for skl-hda-card
+
+SectionVerb {
+
+	EnableSequence [
+		cdev "hw:sofsklhdacard"
+		cset "name='Master Playback Switch' on"
+		cset "name='Master Playback Volume' 80"
+		cset "name='Capture Switch' on"
+		cset "name='Input Source' 1"
+		cset "name='Pin5-Port0 Mux' 1" #HDMI1
+		cset "name='Pin5-Port1 Mux' 0" #MST1-2
+		cset "name='Pin5-Port2 Mux' 0" #MST1-3
+		cset "name='Pin6-Port0 Mux' 2" #HDMI2
+		cset "name='Pin6-Port1 Mux' 0" #MST2-2
+		cset "name='Pin6-Port2 Mux' 0" #MST2-3
+		cset "name='Pin7-Port0 Mux' 3" #HDMI3
+		cset "name='Pin7-Port1 Mux' 0" #MST3-2
+		cset "name='Pin7-Port2 Mux' 0" #MST3-3
+		cset "name='hif5-0 Jack Switch' on"
+		cset "name='hif5-1 Jack Switch' on"
+		cset "name='hif5-2 Jack Switch' on"
+		cset "name='hif6-0 Jack Switch' on"
+		cset "name='hif6-1 Jack Switch' on"
+		cset "name='hif6-2 Jack Switch' on"
+		cset "name='hif7-0 Jack Switch' on"
+		cset "name='hif7-1 Jack Switch' on"
+		cset "name='hif7-2 Jack Switch' on"
+	]
+
+	DisableSequence [
+		cdev "hw:sofsklhdacard"
+		cset "name='Master Playback Switch' off"
+		cset "name='Capture Switch' off"
+		cset "name='Input Source' 0"
+	]
+}
+
+SectionDevice."Headphone" {
+	Comment "Headphone"
+
+	ConflictingDevice [
+                "Speaker"
+        ]
+	
+	EnableSequence [
+		cdev "hw:sofsklhdacard"
+		cset "name='Headphone Playback Volume' 80"
+		cset "name='Headphone Mic Boost Volume' 1"
+		cset "name='Headphone Playback Switch' on"
+                cset "name='Speaker Playback Switch' off"
+	]
+
+	DisableSequence [
+		cdev "hw:sofsklhdacard"
+		cset "name='Headphone Playback Switch' off"
+
+	]
+
+	Value {
+		PlaybackPCM "hw:sofsklhdacard,0"
+		PlaybackChannels "2"
+		JackHWMute "Speaker"
+		JackControl "Headphone Mic Jack"
+	}
+}
+
+SectionDevice."Speaker" {
+        Comment "Speaker"
+
+        ConflictingDevice [
+                "Headphone"
+        ]
+
+        EnableSequence [
+                cdev "hw:sofsklhdacard"
+                cset "name='Speaker Playback Switch' on"
+                cset "name='Speaker Playback Volume' 81"
+		cset "name='Headphone Playback Switch' off"
+        ]
+
+        DisableSequence [
+                cset "name='Speaker Playback Switch' off"
+        ]
+
+        Value {
+		PlaybackPCM "hw:sofsklhdacard,0"
+		PlaybackChannels "2"
+		JackHWMute "Headphone"
+        }
+}
+
+SectionDevice."Microphone" {
+	Comment "Headset Mic"
+
+        EnableSequence [
+                cdev "hw:sofsklhdacard"
+        ]
+
+        DisableSequence [
+                cdev "hw:sofsklhdacard"
+        ]
+
+        Value {
+		CapturePCM "hw:sofsklhdacard,0"
+                CaptureChannels "2"
+		JackControl "Headphone Mic Jack"
+        }
+}
+
+SectionDevice."Dmic" {
+        Comment "Digital Micrphone"
+
+        EnableSequence [
+                cdev "hw:sofsklhdacard"
+                cset "name='PGA10.0 10 Master Capture Volume' 75"
+        ]
+
+        DisableSequence [
+                cdev "hw:sofsklhdacard"
+        ]
+
+        Value {
+		CapturePCM "hw:sofsklhdacard,7"
+                CaptureChannels "2"
+        }
+}
+
+# Use case Configuration for skl-hda-card
+
+SectionVerb {
+
+	EnableSequence [
+	]
+
+	DisableSequence [
+	]
+
+        Value {
+        }
+}
+
+
+SectionDevice."HDMI1" {
+        Comment "HDMI1/DP1 Output"
+
+        ConflictingDevice [
+        l        # users of Mux 1
+		"DPMST2-2"
+		"DPMST3-2"
+        ]
+
+        EnableSequence [
+                cdev "hw:sofsklhdacard"
+                cset "name='hif5-0 Jack Switch' off"
+		cset "name='Pin5-Port0 Mux' 1"
+                cset "name='hif5-0 Jack Switch' on"
+        ]
+
+        DisableSequence [
+                cdev "hw:sofsklhdacard"
+		cset "name='Pin5-Port0 Mux' 0"
+        ]
+
+        Value {
+                PlaybackPCM "hw:sofsklhdacard,3"
+                PlaybackChannels "2"
+		JackControl "HDMI/DP, pin:port=5:0 Jack"
+        }
+}
+
+SectionDevice."DPMST1-2" {
+        Comment "DPMST1-2 Output"
+
+        ConflictingDevice [
+                # users of Mux 2        
+		"HDMI2"
+		"DPMST3-3"
+        ]
+
+        EnableSequence [
+                cdev "hw:sofsklhdacard"
+                cset "name='hif5-1 Jack Switch' off"
+		cset "name='Pin5-Port1 Mux' 2"
+                cset "name='hif5-1 Jack Switch' on"
+        ]
+
+        DisableSequence [
+                cdev "hw:sofsklhdacard"
+		cset "name='Pin5-Port1 Mux' 0"
+        ]
+
+        Value {
+                PlaybackPCM "hw:sofsklhdacard,4"
+                PlaybackChannels "2"
+		JackControl "HDMI/DP, pin:port=5:1 Jack"
+        }
+}
+
+SectionDevice."DPMST1-3" {
+        Comment "DPMST1-3 Output"
+
+        ConflictingDevice [
+                # users of Mux 3
+		"HDMI3"
+		"DPMST2-3"
+        ]
+
+        EnableSequence [
+                cdev "hw:sofsklhdacard"
+                cset "name='hif5-2 Jack Switch' off"
+		cset "name='Pin5-Port1 Mux' 3"
+                cset "name='hif5-2 Jack Switch' on"                
+        ]
+
+        DisableSequence [
+                cdev "hw:sofsklhdacard"
+		cset "name='Pin5-Port2 Mux' 0"
+        ]
+
+        Value {
+                PlaybackPCM "hw:sofsklhdacard,5"
+                PlaybackChannels "2"
+		JackControl "HDMI/DP, pin:port=5:2 Jack"
+        }
+}
+
+SectionDevice."HDMI2" {
+        Comment "HDMI2/DP2 Output"
+
+        ConflictingDevice [
+                # users of Mux 2
+		"DPMST1-2"
+		"DPMST3-3"
+        ]
+
+        EnableSequence [
+                cdev "hw:sofsklhdacard"
+                cset "name='hif6-0 Jack Switch' off"
+		cset "name='Pin6-Port0 Mux' 2"
+                cset "name='hif6-0 Jack Switch' on"
+        ]
+
+        DisableSequence [
+                cdev "hw:sofsklhdacard"
+		cset "name='Pin6-Port0 Mux' 0"
+		#cset "name='hif6-0 Jack Switch' off"
+        ]
+
+        Value {
+                PlaybackPCM "hw:sofsklhdacard,4"
+                PlaybackChannels "2"
+		JackControl "HDMI/DP, pin:port=6:0 Jack"
+		# JackHWMute "Headset"
+        }
+}
+
+SectionDevice."DPMST2-2" {
+        Comment "DPMST2-2 Output"
+
+        ConflictingDevice [
+                # users of Mux 1        
+		"HDMI1"
+		"DPMST3-1"                
+        ]
+
+        EnableSequence [
+                cdev "hw:sofsklhdacard"
+                cset "name='hif6-1 Jack Switch' on"
+		cset "name='Pin6-Port1 Mux' 1"
+        ]
+
+        DisableSequence [
+                cdev "hw:sofsklhdacard"
+		cset "name='Pin6-Port1 Mux' 0"
+        ]
+
+        Value {
+                PlaybackPCM "hw:sofsklhdacard,3"
+                PlaybackChannels "2"
+		JackControl "HDMI/DP, pin:port=6:1 Jack"
+        }
+}
+
+SectionDevice."DPMST2-3" {
+        Comment "DPMST2-3 Output"
+
+        ConflictingDevice [
+                # users of Mux 3
+		"HDMI3"
+		"DPMST1-3"
+        ]
+
+        EnableSequence [
+                cdev "hw:sofsklhdacard"
+                cset "name='hif6-2 Jack Switch' on"
+		cset "name='Pin6-Port2 Mux' 3"
+        ]
+
+        DisableSequence [
+                cdev "hw:sofsklhdacard"
+		cset "name='Pin6-Port2 Mux' 0"
+        ]
+
+        Value {
+                PlaybackPCM "hw:sofsklhdacard,5"
+                PlaybackChannels "2"
+		JackControl "HDMI/DP, pin:port=6:2 Jack"
+        }
+}
+
+SectionDevice."HDMI3" {
+        Comment "HDMI3/DP3 Output"
+
+        ConflictingDevice [
+                # users of Mux 3
+		"DPMST1-3"
+		"DPMST2-3"
+        ]
+
+        EnableSequence [
+                cdev "hw:sofsklhdacard"
+                cset "name='hif7-0 Jack Switch' on"
+		cset "name='Pin7-Port0 Mux' 3"
+        ]
+
+        DisableSequence [
+                cdev "hw:sofsklhdacard"
+		cset "name='Pin7-Port0 Mux' 0"
+        ]
+
+        Value {
+                PlaybackPCM "hw:sofsklhdacard,5"
+                PlaybackChannels "2"
+		JackControl "HDMI/DP, pin:port=7:0 Jack"
+        }
+}
+
+SectionDevice."DPMST3-2" {
+        Comment "DPMST3-2 Output"
+
+        ConflictingDevice [
+                # users of Mux 1
+		"HDMI1"
+		"DPMST2-1"
+        ]
+
+        EnableSequence [
+                cdev "hw:sofsklhdacard"
+                cset "name='hif7-1 Jack Switch' on"
+		cset "name='Pin7-Port1 Mux' 1"
+        ]
+
+        DisableSequence [
+                cdev "hw:sofsklhdacard"
+		cset "name='Pin7-Port1 Mux' 0"
+        ]
+
+        Value {
+                PlaybackPCM "hw:sofsklhdacard,3"
+                PlaybackChannels "2"
+		JackControl "HDMI/DP, pin:port=7:1 Jack"
+        }
+}
+
+SectionDevice."DPMST3-3" {
+        Comment "DPMST3-3 Output"
+
+        ConflictingDevice [
+                # users of Mux 2
+		"HDMI2"
+		"DPMST1-2"
+        ]
+
+        EnableSequence [
+                cdev "hw:sofsklhdacard"
+                cset "name='hif7-2 Jack Switch' on"
+		cset "name='Pin7-Port2 Mux' 2"
+        ]
+
+        DisableSequence [
+                cdev "hw:sofsklhdacard"
+		cset "name='Pin7-Port2 Mux' 0"
+        ]
+
+        Value {
+                PlaybackPCM "hw:sofsklhdacard,4"
+                PlaybackChannels "2"
+		JackControl "HDMI/DP, pin:port=7:2 Jack"
+        }
+}
